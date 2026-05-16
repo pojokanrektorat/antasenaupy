@@ -175,10 +175,42 @@ button:active {
 <div class="wrapper">
 
 <div class="content">
-<h3>Scan QR Map</h3>
-<button onclick="startScan()">SCAN</button><br>
+<h3>Inisiasi Map</h3>
+
+<button onclick="startScan()">Scan</button>
 
 <div id="reader"></div>
+
+<!-- INPUT MANUAL -->
+<div style="max-width:180px; margin:20px auto;">
+
+  <input
+    type="text"
+    id="manualQR"
+    placeholder="Atau tulis nama Map"
+	style="padding:5px 8px; height:32px;"
+  >
+
+  <div style="display:flex; gap:6px; margin-top:5px;">
+
+  <button
+    id="btnManual"
+    onclick="cekManual()"
+    style="flex:1;"
+  >
+    Cek
+  </button>
+
+  <button
+    onclick="resetManual()"
+    style="flex:1; background:#dc3545;"
+  >
+    Reset
+  </button>
+
+</div>
+
+</div>
 </div>
 
 <!-- MODAL -->
@@ -229,6 +261,58 @@ function startScan(){
   });
 }
 
+/* =========================
+   INPUT MANUAL
+========================= */
+function cekManual(){
+
+  const qr =
+    document.getElementById("manualQR")
+    .value
+    .trim();
+
+  if(!qr){
+
+    showToast(
+      "Kode QR wajib diisi",
+      "error"
+    );
+
+    return;
+  }
+
+  const btn =
+    document.getElementById("btnManual");
+
+  btn.innerText = "Memproses...";
+  btn.disabled = true;
+
+  fetch(API_URL,{
+    method:"POST",
+    body: JSON.stringify({
+      action:"scan",
+      qr:qr
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>handleResult(res))
+  .catch(()=>{
+
+    showToast(
+      "Terjadi kesalahan",
+      "error"
+    );
+
+  })
+  .finally(()=>{
+
+    btn.innerText = "Cek";
+    btn.disabled = false;
+
+  });
+
+}
+	
 /* HANDLE RESULT */
 function handleResult(res){
 
@@ -382,7 +466,7 @@ function kirim(){
     showToast("Terjadi kesalahan","error");
   })
   .finally(()=>{
-    btn.innerText = "Kirim";
+    btn.innerText = "Ajukan";
     btn.disabled = false;
   });
 }
@@ -452,6 +536,13 @@ function showToast(msg,type="success"){
 function goBack(){
   window.location.href = "https://sites.google.com/upy.ac.id/antasena";
 }
+
+function resetManual(){
+
+  document.getElementById("manualQR").value = "";
+
+}
+	
 </script>
 <div class="footer">
 
